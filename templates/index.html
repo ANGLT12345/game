@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sustainability Game</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Sustainability Quiz by Ecohive</h1>
+        <h5>Development by Liang Tze</h5>
+        <div id="question-container">
+            <p id="question"></p>
+            <div id="options"></div>
+        </div>
+        <button id="next-button" style="display: none;">Next Question</button>
+        <p id="feedback"></p>
+    </div>
+
+    <script>
+        const questionContainer = document.getElementById('question-container');
+        const questionElement = document.getElementById('question');
+        const optionsElement = document.getElementById('options');
+        const nextButton = document.getElementById('next-button');
+        const feedbackElement = document.getElementById('feedback');
+
+        let currentQuestion;
+
+        function fetchQuestion() {
+            fetch('/api/question')
+                .then(response => response.json())
+                .then(data => {
+                    currentQuestion = data;
+                    displayQuestion();
+                });
+        }
+
+        function displayQuestion() {
+            questionElement.innerText = currentQuestion.question;
+            optionsElement.innerHTML = '';
+            currentQuestion.options.forEach(option => {
+                const button = document.createElement('button');
+                button.innerText = option;
+                button.classList.add('option-button');
+                button.addEventListener('click', () => selectOption(option));
+                optionsElement.appendChild(button);
+            });
+            nextButton.style.display = 'none';
+        }
+
+        function selectOption(option) {
+            if (option === currentQuestion.answer) {
+                feedbackElement.innerText = 'Correct!';
+            } else {
+                feedbackElement.innerText = 'Wrong! The correct answer is: ' + currentQuestion.answer;
+            }
+            nextButton.style.display = 'block';
+        }
+
+        nextButton.addEventListener('click', () => {
+            feedbackElement.innerText = '';
+            fetchQuestion();
+        });
+
+        // Start the game by fetching the first question
+        fetchQuestion();
+    </script>
+</body>
+</html>
